@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ricette</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css" rel="stylesheet">
+
+</head>
+
+  <body>
+<script src="script.js"></script>
+<script src="navScript.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <a class="navbar-brand text-warning" href="index.html">PGRC</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" href="ricette.html">Ricette</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="categorie.html">Categorie</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="recensioni.html">Recensioni</a>
+              </li>             
+            </ul>   
+            <div id="userAuthStatus" class="d-flex justify-content-end align-items-center">
+              
+            </div>  
+          </div>
+        </div>
+      </nav>
+
+      <div class="container text-center mt-3">
+        <div class="row">
+          <div class="col-md-2">                
+          </div>
+          <div class="col-md-8">
+             <div class="input-group">
+                 <input type="text" class="form-control" placeholder="Cerca ricetta per nome o iniziale" aria-label="Recipient's username" aria-describedby="button-addon2" id="search">
+                <button class="btn btn-outline-warning" type="button" id="button-addon2">Cerca</button>             
+             </div>
+        </div>
+          <div class="col-md-2">               
+          </div>
+        </div>
+</div>
+
+<div class="container text-center mt-3" id="ricette" > 
+    <div class="row">
+      
+      <div class="col-md-12">
+  <div id = "container" class="row row-cols-1 row-cols-md-3 g-4 gap-2 justify-content-md-center">
+    </div>
+  </div>
+ 
+ </div>
+  </div>
+
+  <script>
+
+// Funzione per ottenere il valore del parametro "param" dall'URL
+function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
+    const recipeCardsContainer = document.getElementById("container");
+    const searchBar = document.getElementById("search");
+    const button = document.getElementById("button-addon2");
+    
+    const filter = getQueryParam("param");
+
+    if(filter){
+      displayRecipes(filter)
+    }
+    
+     button.addEventListener( 'click', (e)=>{
+      let filter = searchBar.value;
+      displayRecipes(filter);
+    })
+
+      function displayRecipes(filter){
+          while(recipeCardsContainer.firstChild) {
+              recipeCardsContainer.removeChild(recipeCardsContainer.firstChild);
+            }
+        
+        console.log(filter);
+
+        if(filter.length == 1){
+            
+            fetch(`https://www.themealdb.com/api/json/v1/1/search.php?f=${filter}`)
+            .then(res=> res.json())
+            .then((output) =>{    
+
+                  output.meals.forEach(recipe => {
+                    const id = recipe.idMeal;
+                    fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`)
+                     .then(res => res.json())
+                    .then(fullRecipeData => {
+                  
+                  const recipeCardElement = generateRecipeCardElement(fullRecipeData.meals[0]);
+                  recipeCardsContainer.appendChild(recipeCardElement);
+                });
+            });    
+        })}else{
+          
+            fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${filter}`)
+            .then(res=> res.json())
+            .then((output) =>{  
+
+                  output.meals.forEach(recipe => {
+                    const id = recipe.idMeal;
+                    fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`)
+                     .then(res => res.json())
+                    .then(fullRecipeData => {
+                  
+                  const recipeCardElement = generateRecipeCardElement(fullRecipeData.meals[0]);
+                  recipeCardsContainer.appendChild(recipeCardElement);
+                });
+            });    
+        })
+       }
+      }
+      
+     
+        
+  </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+  
+  </body>
